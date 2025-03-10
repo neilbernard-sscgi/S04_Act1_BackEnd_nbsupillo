@@ -125,134 +125,101 @@ function fight(fPokemon, sPokemon) {
 
   console.log(`${fPokemon.name} VS ${sPokemon.name}`);
   console.log("-------------Start-----------------");
-
-  // function pokemonTrun() {}
-
-  // let fPokemonTrun = pokemonTrun(fPokemon, sPokemon);
-  // if (fPokemonTrun === "stop") break;
-
-  // let sPokemonTrun = pokemonTrun(sPokemon, fPokemon);
-  // if (sPokemonTrun === "stop") break;
-
+  let round = 0;
   while (fPokemon.hp > 1 && sPokemon.hp > 1) {
-    console.log("");
-    console.log(`${fPokemon.name} turn!`);
-
-    let fAttackType = prompt(makePrompt(fPokemon));
-    // const number = parseInt(attack);
-    // if (!isNaN(number) && number <= 4 && number >= 1) {
-    //   console.log("number");
-    // }
-    if (
-      fAttackType === "m1" ||
-      fAttackType === "m2" ||
-      fAttackType === "m3" ||
-      fAttackType === "n"
-    ) {
+    function pokemonTrun(fPokemon, sPokemon) {
       console.log("");
-      if (fAttackType === "n") {
-        let p1Attack = fPokemon[attackConvert[fAttackType]];
-        // console.log(`${sPokemon.hp} -
-        //   (${p1Attack} + ${typeAdvantage(fPokemon.type, sPokemon.type)}`);
-        sPokemon.hp =
-          sPokemon.hp -
-          (p1Attack + typeAdvantage(fPokemon.type, sPokemon.type));
-        if (sPokemon.hp <= 0) {
-          console.log(
-            `${sPokemon.name} didn't survived the attack from ${fPokemon.name}`
-          );
-          console.log(`${fPokemon.name} win!!`);
-          break;
-        }
-        console.log(
-          `${sPokemon.name} survived the attack from ${fPokemon.name}`
-        );
-        console.log(`${sPokemon.name} current hp: ${sPokemon.hp}`);
-      } else {
-        let p1Attack = fPokemon.move[attackConvert[fAttackType]];
+      console.log(`${fPokemon.name} turn!`);
 
-        sPokemon.hp =
-          sPokemon.hp -
-          (p1Attack.damage + typeAdvantage(fPokemon.type, sPokemon.type));
-        if (sPokemon.hp <= 0) {
+      //console.log(fPokemon.defense);
+      let fAttackType = prompt(makePrompt(fPokemon));
+      // const number = parseInt(attack);
+      // if (!isNaN(number) && number <= 4 && number >= 1) {
+      //   console.log("number");
+      // }
+      if (
+        fAttackType === "m1" ||
+        fAttackType === "m2" ||
+        fAttackType === "m3" ||
+        fAttackType === "n"
+      ) {
+        console.log("");
+        if (fAttackType === "n") {
+          let p1Attack = fPokemon[attackConvert[fAttackType]];
+          // console.log(`${sPokemon.hp} -
+          //   (${p1Attack} + ${typeAdvantage(fPokemon.type, sPokemon.type)}`);
+          let totalAttack =
+            p1Attack + typeAdvantage(fPokemon.type, sPokemon.type);
+
+          if (sPokemon.defense > 0) {
+            sPokemon.defense -= totalAttack;
+            if (sPokemon.defense < 0) {
+              sPokemon.hp = sPokemon.defense + sPokemon.hp;
+            }
+          } else {
+            sPokemon.hp -= p1Attack;
+          }
+
+          if (sPokemon.hp <= 0) {
+            console.log(
+              `${sPokemon.name} didn't survived the attack from ${fPokemon.name}`
+            );
+            console.log(`${fPokemon.name} win!!`);
+            return "stop";
+          }
           console.log(
-            `${sPokemon.name} didn't survived the attack from ${fPokemon.name}`
+            `${sPokemon.name} survived the attack from ${fPokemon.name}`
           );
-          console.log(`${fPokemon.name} win!!`);
-          break;
+          console.log(`${sPokemon.name} current defense: ${sPokemon.defense}`);
+          console.log(`${sPokemon.name} current hp: ${sPokemon.hp}`);
+        } else {
+          let p1Attack = fPokemon.move[attackConvert[fAttackType]];
+          //console.log("attack", p1Attack);
+          let totalAttack =
+            p1Attack.damage + typeAdvantage(fPokemon.type, sPokemon.type);
+          //console.log(totalAttack, fPokemon.defense);
+          if (sPokemon.defense > 0) {
+            sPokemon.defense -= totalAttack;
+
+            if (sPokemon.defense < 0) {
+              sPokemon.hp = sPokemon.defense + sPokemon.hp;
+              //console.log(sPokemon.defense, sPokemon.hp);
+              sPokemon.defense = 0;
+            }
+          } else {
+            sPokemon.hp -= p1Attack.damage;
+          }
+          if (sPokemon.hp <= 0) {
+            console.log(
+              `${sPokemon.name} didn't survived the attack from ${fPokemon.name}`
+            );
+            console.log(`${fPokemon.name} win!!`);
+            return "stop";
+          }
+          console.log(
+            `${sPokemon.name} survived the attack from ${fPokemon.name}`
+          );
+          console.log(`${sPokemon.name} current defense: ${sPokemon.defense}`);
+          console.log(`${sPokemon.name} current hp: ${sPokemon.hp}`);
         }
-        console.log(
-          `${sPokemon.name} survived the attack from ${fPokemon.name}`
-        );
-        console.log(`${sPokemon.name} current hp: ${sPokemon.hp}`);
+      } else if (fAttackType === "s") {
+        console.log(`${fPokemon.name} surrender the battle`);
+        return "stop";
+      } else {
+        console.log("Not valid attack");
+        //continue;
       }
-    } else if (fAttackType === "s") {
-      console.log("Cancelled tha battle");
-      break;
-    } else {
-      console.log("Not valid attack");
-      //continue;
     }
-    //console.log(fPokemon);
-    // --------------------second Pokemon turn-------------------------------------
+
+    console.log(`-------------Round ${++round}-----------------`);
     console.log("");
-    console.log(`${sPokemon.name} turn!`);
+    let fPokemonTrun = pokemonTrun(fPokemon, sPokemon);
+    if (fPokemonTrun === "stop") break;
 
-    let sAttackType = prompt(makePrompt(sPokemon));
-    // const number = parseInt(attack);
-    // if (!isNaN(number) && number <= 4 && number >= 1) {
-    //   console.log("number");
-    // }
-    if (
-      sAttackType === "m1" ||
-      sAttackType === "m2" ||
-      sAttackType === "m3" ||
-      sAttackType === "n"
-    ) {
-      console.log("");
-      if (sAttackType === "n") {
-        let p2Attack = sPokemon[attackConvert[sAttackType]];
-        // console.log(`${fPokemon.hp} -
-        //   (${p2Attack} + ${typeAdvantage(sPokemon.type, fPokemon.type)}`);
-        fPokemon.hp =
-          fPokemon.hp -
-          (p2Attack + typeAdvantage(sPokemon.type, fPokemon.type));
-        if (fPokemon.hp <= 0) {
-          console.log(
-            `${fPokemon.name} didn't survived the attack fromsPokemon.name}`
-          );
-          console.log(`${sPokemon.name} win!!`);
-          break;
-        }
-        console.log(
-          `${fPokemon.name} survived the attack from ${sPokemon.name}`
-        );
-        console.log(`${fPokemon.name} current hp: ${fPokemon.hp}`);
-      } else {
-        let p2Attack = sPokemon.move[attackConvert[sAttackType]];
-        fPokemon.hp =
-          fPokemon.hp -
-          (p2Attack.damage + typeAdvantage(sPokemon.type, fPokemon.type));
-        if (fPokemon.hp <= 0) {
-          console.log(
-            `${fPokemon.name} didn't survived the attack from ${sPokemon.name}`
-          );
-          console.log(`${sPokemon.name} win!!`);
-          break;
-        }
-        console.log(
-          `${fPokemon.name} survived the attack from ${sPokemon.name}`
-        );
-        console.log(`${fPokemon.name} current hp: ${fPokemon.hp}`);
-      }
-    } else if (sAttackType === "s") {
-      console.log(`${sPokemon.name} Surrendered`);
-      break;
-    } else {
-      console.log("Not valid attack");
-      //continue;
-    }
+    let sPokemonTrun = pokemonTrun(sPokemon, fPokemon);
+    if (sPokemonTrun === "stop") break;
   }
+  return "Game Ended";
 }
 
 function pickPokemon(pokemons) {
@@ -266,7 +233,7 @@ function pickPokemon(pokemons) {
 
   function pick() {
     let isPick = false;
-    let pokemon = undefined;
+    let pokemon = [];
     while (isPick === false) {
       let fPokemonPick = prompt(printPokemons(pokemons));
       if (fPokemonPick === "c") {
@@ -286,9 +253,9 @@ function pickPokemon(pokemons) {
 
   let arr = [];
   arr[0] = pick();
-  if (arr[0] === undefined) return false;
+  if (arr[0] === false) return false;
   arr[1] = pick();
-  if (arr[1] === undefined) return false;
+  if (arr[1] === false) return false;
 
   return arr;
 }
