@@ -146,61 +146,13 @@ function fight(fPokemon, sPokemon) {
         console.log("");
         if (fAttackType === "n") {
           let p1Attack = fPokemon[attackConvert[fAttackType]];
-          // console.log(`${sPokemon.hp} -
-          //   (${p1Attack} + ${typeAdvantage(fPokemon.type, sPokemon.type)}`);
-          let totalAttack =
-            p1Attack + typeAdvantage(fPokemon.type, sPokemon.type);
-
-          if (sPokemon.defense > 0) {
-            sPokemon.defense -= totalAttack;
-            if (sPokemon.defense < 0) {
-              sPokemon.hp = sPokemon.defense + sPokemon.hp;
-            }
-          } else {
-            sPokemon.hp -= p1Attack;
-          }
-
-          if (sPokemon.hp <= 0) {
-            console.log(
-              `${sPokemon.name} didn't survived the attack from ${fPokemon.name}`
-            );
-            console.log(`${fPokemon.name} win!!`);
-            return "stop";
-          }
-          console.log(
-            `${sPokemon.name} survived the attack from ${fPokemon.name}`
-          );
-          console.log(`${sPokemon.name} current defense: ${sPokemon.defense}`);
-          console.log(`${sPokemon.name} current hp: ${sPokemon.hp}`);
+          let res = battleResult(fPokemon, sPokemon, "normal", p1Attack);
+          if (res === "stop") return "stop";
         } else {
           let p1Attack = fPokemon.move[attackConvert[fAttackType]];
           //console.log("attack", p1Attack);
-          let totalAttack =
-            p1Attack.damage + typeAdvantage(fPokemon.type, sPokemon.type);
-          //console.log(totalAttack, fPokemon.defense);
-          if (sPokemon.defense > 0) {
-            sPokemon.defense -= totalAttack;
-
-            if (sPokemon.defense < 0) {
-              sPokemon.hp = sPokemon.defense + sPokemon.hp;
-              //console.log(sPokemon.defense, sPokemon.hp);
-              sPokemon.defense = 0;
-            }
-          } else {
-            sPokemon.hp -= p1Attack.damage;
-          }
-          if (sPokemon.hp <= 0) {
-            console.log(
-              `${sPokemon.name} didn't survived the attack from ${fPokemon.name}`
-            );
-            console.log(`${fPokemon.name} win!!`);
-            return "stop";
-          }
-          console.log(
-            `${sPokemon.name} survived the attack from ${fPokemon.name}`
-          );
-          console.log(`${sPokemon.name} current defense: ${sPokemon.defense}`);
-          console.log(`${sPokemon.name} current hp: ${sPokemon.hp}`);
+          let res = battleResult(fPokemon, sPokemon, "move", p1Attack);
+          if (res === "stop") return "stop";
         }
       } else if (fAttackType === "s") {
         console.log(`${fPokemon.name} surrender the battle`);
@@ -209,6 +161,37 @@ function fight(fPokemon, sPokemon) {
         console.log("Not valid attack");
         //continue;
       }
+    }
+    function battleResult(fPokemon, sPokemon, attackType, attackDamage) {
+      // console.log(`${sPokemon.hp} -
+      //   (${p1Attack} + ${typeAdvantage(fPokemon.type, sPokemon.type)}`);
+      let totalAttack =
+        attackType === "normal"
+          ? attackDamage + typeAdvantage(fPokemon.type, sPokemon.type)
+          : attackDamage.damage + typeAdvantage(fPokemon.type, sPokemon.type);
+
+      if (sPokemon.defense > 0) {
+        sPokemon.defense -= totalAttack;
+        if (sPokemon.defense < 0) {
+          sPokemon.hp = sPokemon.defense + sPokemon.hp;
+          sPokemon.defense = 0;
+        }
+      } else {
+        sPokemon.hp -= totalAttack;
+      }
+
+      if (sPokemon.hp <= 0) {
+        console.log(
+          `${sPokemon.name} didn't survived the attack from ${fPokemon.name}`
+        );
+        console.log(`${fPokemon.name} win!!`);
+        return "stop";
+      }
+      console.log(`${sPokemon.name} survived the attack from ${fPokemon.name}`);
+      console.log(`${sPokemon.name} current defense: ${sPokemon.defense}`);
+      console.log(`${sPokemon.name} current hp: ${sPokemon.hp}`);
+
+      return "continue";
     }
 
     console.log(`-------------Round ${++round}-----------------`);
