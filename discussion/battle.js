@@ -1,113 +1,12 @@
-function createPokemon(
-  name,
-  type,
-  hp,
-  attack,
-  defense,
-  move1,
-  move1d,
-  move2,
-  move2d,
-  move3,
-  move3d
-) {
-  return {
-    name: name,
-    type: type,
-    hp: hp,
-    attack: attack,
-    defense: defense,
-    move: [
-      {
-        name: move1,
-        damage: move1d,
-      },
-      {
-        name: move2,
-        damage: move2d,
-      },
-      {
-        name: move3,
-        damage: move3d,
-      },
-    ],
-  };
-}
+import pokemons from "./pokemons.js";
+//defese, heal, critical hit, turns
 
-const pokemon1 = createPokemon(
-  "Bulbasaur",
-  "Water",
-  1000,
-  50,
-  1000,
-  "Hydro Pump",
-  100,
-  "Surf",
-  200,
-  "Aqua Tail",
-  300
-);
-const pokemon2 = createPokemon(
-  "Leafeon",
-  "Water",
-  1000,
-  50,
-  1000,
-  "Hydro Pump",
-  100,
-  "Surf",
-  200,
-  "Aqua Tail",
-  300
-);
-const pokemon3 = createPokemon(
-  "Squirtle",
-  "Fire",
-  1000,
-  50,
-  1000,
-  "Flamethrower",
-  100,
-  "Fire Blast",
-  200,
-  "Fire Ball",
-  300
-);
-const pokemon4 = createPokemon(
-  "Gyarados",
-  "Fire",
-  1000,
-  50,
-  1000,
-  "Flamethrower",
-  100,
-  "Fire Blast",
-  200,
-  "Fire Ball",
-  300
-);
-const pokemon5 = createPokemon(
-  "Charizard",
-  "Grass",
-  1000,
-  50,
-  1000,
-  "Leaf Blade",
-  100,
-  "Solar Beam",
-  200,
-  "Energy Ball",
-  300
-);
-//console.log(pokemon1);
-const pokemons = [pokemon1, pokemon2, pokemon3, pokemon4, pokemon5];
+function typeAdvantage(p1, p2) {
+  if (p1 === "Fire" && p2 === "Grass") return 50;
 
-function typeAdvantage(attackerType, defenderType) {
-  if (attackerType === "Fire" && defenderType === "Grass") return 50;
+  if (p1 === "Water" && p2 === "Fire") return 50;
 
-  if (attackerType === "Water" && defenderType === "Fire") return 50;
-
-  if (attackerType === "Grass" && defenderType === "Water") return 50;
+  if (p1 === "Grass" && p2 === "Water") return 50;
 
   return 0;
 }
@@ -116,7 +15,7 @@ function makePrompt(pokemon) {
 }
 
 function fight(fPokemon, sPokemon) {
-  let attackConvert = {
+  const attackConvert = {
     m1: 0,
     m2: 1,
     m3: 2,
@@ -125,14 +24,21 @@ function fight(fPokemon, sPokemon) {
 
   console.log(`${fPokemon.name} VS ${sPokemon.name}`);
   console.log("-------------Start-----------------");
+
   let round = 0;
+  const attackPlusP1 = typeAdvantage(fPokemon.type, sPokemon.type);
+  console.log("1", attackPlusP1);
+  const attackPlusP2 = typeAdvantage(sPokemon.type, fPokemon.type);
+  console.log("1", attackPlusP2);
+
+  //return false;
   while (fPokemon.hp > 1 && sPokemon.hp > 1) {
-    function pokemonTrun(fPokemon, sPokemon) {
+    function pokemonTrun(fPokemon, sPokemon, attackPlus) {
       console.log("");
       console.log(`${fPokemon.name} turn!`);
 
       //console.log(fPokemon.defense);
-      let fAttackType = prompt(makePrompt(fPokemon));
+      const fAttackType = prompt(makePrompt(fPokemon));
       // const number = parseInt(attack);
       // if (!isNaN(number) && number <= 4 && number >= 1) {
       //   console.log("number");
@@ -145,13 +51,18 @@ function fight(fPokemon, sPokemon) {
       ) {
         console.log("");
         if (fAttackType === "n") {
-          let p1Attack = fPokemon[attackConvert[fAttackType]];
-          let res = battleResult(fPokemon, sPokemon, "normal", p1Attack);
+          const p1Attack = fPokemon[attackConvert[fAttackType]];
+          console.log(p1Attack + attackPlus);
+          const res = battleResult(fPokemon, sPokemon, p1Attack + attackPlus);
           if (res === "stop") return "stop";
         } else {
-          let p1Attack = fPokemon.move[attackConvert[fAttackType]];
-          //console.log("attack", p1Attack);
-          let res = battleResult(fPokemon, sPokemon, "move", p1Attack);
+          const p1Attack = fPokemon.move[attackConvert[fAttackType]];
+          console.log(p1Attack.damage, attackPlus);
+          const res = battleResult(
+            fPokemon,
+            sPokemon,
+            p1Attack.damage + attackPlus
+          );
           if (res === "stop") return "stop";
         }
       } else if (fAttackType === "s") {
@@ -162,13 +73,10 @@ function fight(fPokemon, sPokemon) {
         //continue;
       }
     }
-    function battleResult(fPokemon, sPokemon, attackType, attackDamage) {
+    function battleResult(fPokemon, sPokemon, attackDamage) {
       // console.log(`${sPokemon.hp} -
       //   (${p1Attack} + ${typeAdvantage(fPokemon.type, sPokemon.type)}`);
-      let totalAttack =
-        attackType === "normal"
-          ? attackDamage + typeAdvantage(fPokemon.type, sPokemon.type)
-          : attackDamage.damage + typeAdvantage(fPokemon.type, sPokemon.type);
+      const totalAttack = attackDamage;
 
       if (sPokemon.defense > 0) {
         sPokemon.defense -= totalAttack;
@@ -196,10 +104,11 @@ function fight(fPokemon, sPokemon) {
 
     console.log(`-------------Round ${++round}-----------------`);
     console.log("");
-    let fPokemonTrun = pokemonTrun(fPokemon, sPokemon);
+
+    const fPokemonTrun = pokemonTrun(fPokemon, sPokemon, attackPlusP1);
     if (fPokemonTrun === "stop") break;
 
-    let sPokemonTrun = pokemonTrun(sPokemon, fPokemon);
+    const sPokemonTrun = pokemonTrun(sPokemon, fPokemon, attackPlusP2);
     if (sPokemonTrun === "stop") break;
   }
   return "Game Ended";
@@ -218,11 +127,11 @@ function pickPokemon(pokemons) {
     let isPick = false;
     let pokemon = [];
     while (isPick === false) {
-      let fPokemonPick = prompt(printPokemons(pokemons));
+      const fPokemonPick = prompt(printPokemons(pokemons));
       if (fPokemonPick === "c") {
         isPick = true;
       }
-      let index = parseInt(fPokemonPick);
+      const index = parseInt(fPokemonPick);
       if (index >= 0 && index <= pokemons.length) {
         isPick = true;
         pokemon = pokemons.splice(index, 1);
@@ -234,7 +143,7 @@ function pickPokemon(pokemons) {
     return pokemon[0] ? pokemon[0] : false;
   }
 
-  let arr = [];
+  const arr = [];
   arr[0] = pick();
   if (arr[0] === false) return false;
   arr[1] = pick();
@@ -243,7 +152,7 @@ function pickPokemon(pokemons) {
   return arr;
 }
 
-let pokemonsPicked = pickPokemon(pokemons);
+const pokemonsPicked = pickPokemon(pokemons);
 if (pokemonsPicked === false) {
   console.log("Cancelled the picking");
 } else {
@@ -252,3 +161,8 @@ if (pokemonsPicked === false) {
 console.log("--------------------------");
 
 //alert("neil");
+//critical hit
+//limited uses of moves
+//heal
+//shield
+//attack first
